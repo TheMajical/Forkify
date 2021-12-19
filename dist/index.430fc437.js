@@ -6,10 +6,12 @@ const timeout = function(s) {
         }, s * 1000);
     });
 };
+if (module.hot) module.hot.accept();
 // https://forkify-api.herokuapp.com/v2
 ///////////////////////////////////////
 async function showRecipe() {
     try {
+        // 1) Loading data from API
         const res = await fetch('https://forkify-api.herokuapp.com/api/v2/recipes/5ed6604591c37cdc054bc886');
         const data = await res.json();
         if (!res.ok) throw new Error(`Wrong URL Id - ${res.status}`);
@@ -25,7 +27,10 @@ async function showRecipe() {
             cookingTime: recipe.cooking_time,
             ingredients: recipe.ingredients
         };
-        console.log(recipe);
+        // 2) Rendering data into HTML
+        const markup = `
+    
+    `;
     } catch (err) {
         alert(`${err.message}`);
     }

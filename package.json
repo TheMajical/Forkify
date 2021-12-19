@@ -16,10 +16,13 @@
   "bugs": {
     "url": "https://github.com/TheMajical/Forkify/issues"
   },
-  "homepage": "https://github.com/TheMajical/Forkify#readme",
   "devDependencies": {
     "@parcel/transformer-sass": "^2.0.1",
     "parcel": "^2.0.1",
     "sass": "^1.26.10"
+  },
+  "dependencies": {
+    "core-js": "^3.20.0",
+    "regenerator-runtime": "^0.13.9"
   }
 }
