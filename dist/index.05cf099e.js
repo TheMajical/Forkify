@@ -476,7 +476,7 @@ async function controlRecipe() {
         await _modelJs.loadRecipe(id);
         _recipeViewJsDefault.default.render(_modelJs.state.recipe);
     } catch (err) {
-        console.error(`${err.message}`);
+        _recipeViewJsDefault.default.renderError();
     }
 }
 function init() {
@@ -14765,7 +14765,7 @@ async function loadRecipe(id) {
             ingredients: recipe.ingredients
         };
     } catch (err) {
-        console.error(`${err.message} ⚠️⚠️⚠️`);
+        throw err;
     }
 }
 
@@ -14816,7 +14816,9 @@ var _fractional = require("fractional");
 class RecipeView {
     #parentElement = document.querySelector('.recipe');
     #data;
+    #errorMessage = 'Could not find that recipe! Please try another one 🤝';
     render(data) {
+        this.#clear();
         this.#data = data;
         const markup = this.#generateMarkup();
         this.#parentElement.insertAdjacentHTML('afterbegin', markup);
@@ -14832,6 +14834,32 @@ class RecipeView {
                   <use href="${_iconsSvgDefault.default}#icon-loader"></use>
                 </svg>
               </div>`;
+        this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+    }
+    renderError(message = this.#errorMessage) {
+        const markup = `
+      <div class="error">
+            <div>
+              <svg>
+                <use href="${_iconsSvgDefault.default}.svg#icon-alert-triangle"></use>
+              </svg>
+            </div>
+            <p>${message}</p>
+          </div>`;
+        this.#clear();
+        this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+    }
+    renderMessage(message1) {
+        const markup = `
+      <div class="message">
+            <div>
+              <svg>
+                <use href="${_iconsSvgDefault.default}.svg#icon-smile"></use>
+              </svg>
+            </div>
+            <p>${message1}</p>
+          </div>`;
+        this.#clear();
         this.#parentElement.insertAdjacentHTML('afterbegin', markup);
     }
      #generateMarkup() {
