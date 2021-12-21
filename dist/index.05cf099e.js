@@ -479,11 +479,10 @@ async function controlRecipe() {
         console.error(`${err.message}`);
     }
 }
-[
-    'hashchange',
-    'load'
-].forEach((ev)=>window.addEventListener(ev, controlRecipe)
-);
+function init() {
+    _recipeViewJsDefault.default.addHandlerRender(controlRecipe);
+}
+init();
 
 },{"core-js/stable":"95FYz","regenerator-runtime/runtime":"1EBPE","@parcel/transformer-js/src/esmodule-helpers.js":"ciiiV","./model.js":"1pVJj","./views/recipeView.js":"82pEw"}],"95FYz":[function(require,module,exports) {
 require('../modules/es.symbol');
@@ -14936,6 +14935,13 @@ class RecipeView {
             </div>
         </li>
         `;
+    }
+    addHandlerRender(handler) {
+        [
+            'hashchange',
+            'load'
+        ].forEach((ev)=>window.addEventListener(ev, handler)
+        );
     }
 }
 exports.default = new RecipeView();
