@@ -24,6 +24,7 @@ async function controlRecipe(){
     await model.loadRecipe(id);
 
     recipeView.render(model.state.recipe);
+
   }
   catch(err){
     recipeView.renderError();
@@ -58,8 +59,15 @@ function controlPagination(gotoPage){
   paginationView.render(model.state.search);
 }
 
+function controlServings(){
+  //update the recipe servings in state
+  model.updateServings(8);
+  //update the recipe view
+}
+
 function init(){
   recipeView.addHandlerRender(controlRecipe);
+  recipeView.addHandlerUpdateServings(controlServings);
   searchView.addHandlerSearch(controlSearchResults);
   paginationView.addHandlerClick(controlPagination);
 }
