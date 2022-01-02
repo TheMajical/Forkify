@@ -17,7 +17,7 @@ if (module.hot) {
 async function controlRecipe(){
   try{
     recipeView.renderSpinner();
-    const id = window.location.hash.slice();
+    const id = window.location.hash.slice(1);
 
     if (!id) return;
 
@@ -59,10 +59,11 @@ function controlPagination(gotoPage){
   paginationView.render(model.state.search);
 }
 
-function controlServings(){
+function controlServings(servingNumber){
   //update the recipe servings in state
-  model.updateServings(8);
+  model.updateServings(servingNumber);
   //update the recipe view
+  recipeView.render(model.state.recipe);
 }
 
 function init(){
