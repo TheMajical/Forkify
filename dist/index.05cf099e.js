@@ -476,9 +476,11 @@ if (module.hot) module.hot.accept();
 ///////////////////////////////////////
 async function controlRecipe() {
     try {
-        _recipeViewJsDefault.default.renderSpinner();
         const id = window.location.hash.slice(1);
         if (!id) return;
+        _recipeViewJsDefault.default.renderSpinner();
+        // 0) upate resutls view to mark selected search result
+        _resultsViewJsDefault.default.update(_modelJs.getSearchResultsPage());
         await _modelJs.loadRecipe(id);
         _recipeViewJsDefault.default.render(_modelJs.state.recipe);
     } catch (err) {
@@ -511,7 +513,8 @@ function controlServings(servingNumber) {
     //update the recipe servings in state
     _modelJs.updateServings(servingNumber);
     //update the recipe view
-    _recipeViewJsDefault.default.render(_modelJs.state.recipe);
+    //recipeView.render(model.state.recipe);
+    _recipeViewJsDefault.default.update(_modelJs.state.recipe);
 }
 function init() {
     _recipeViewJsDefault.default.addHandlerRender(controlRecipe);
@@ -1104,6 +1107,23 @@ class View {
     _clear() {
         this._parentElement.innerHTML = '';
     }
+    update(data1) {
+        if (!data1 || Array.isArray(data1) && data1.length === 0) return this.renderError();
+        this._data = data1;
+        const newMarkup = this._generateMarkup();
+        const newDOM = document.createRange().createContextualFragment(newMarkup);
+        const newElements = newDOM.querySelectorAll('*');
+        const curElements = this._parentElement.querySelectorAll('*');
+        newElements.forEach((newEl, i)=>{
+            const curEl = curElements[i];
+            //Updates changed text
+            if (!newEl.isEqualNode(curEl) && newEl.firstChild?.nodeValue.trim() !== '') curEl.textContent = newEl.textContent;
+            //Updates changed attributes
+            if (!newEl.isEqualNode(curEl)) Array.from(newEl.attributes).forEach((attr)=>{
+                curEl.setAttribute(attr.name, attr.value);
+            });
+        });
+    }
     renderSpinner() {
         this._clear();
         const markup = `
@@ -1179,9 +1199,10 @@ class ResultsView extends _viewDefault.default {
         ).join();
     }
     _generateMarkupPreview(result) {
+        const id = window.location.hash.slice(1);
         return `
         <li class="preview">
-            <a class="preview__link " href="#${result.id}">
+            <a class="preview__link ${result.id === id ? 'preview__link--active' : ''}" href="#${result.id}">
               <figure class="preview__fig">
                 <img src="${result.image}" alt="${result.title}" />
               </figure>

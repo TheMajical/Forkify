@@ -16,10 +16,12 @@ if (module.hot) {
 ///////////////////////////////////////
 async function controlRecipe(){
   try{
-    recipeView.renderSpinner();
     const id = window.location.hash.slice(1);
-
     if (!id) return;
+
+    recipeView.renderSpinner();
+    // 0) upate resutls view to mark selected search result
+    resultsView.update(model.getSearchResultsPage());
 
     await model.loadRecipe(id);
 
@@ -63,7 +65,8 @@ function controlServings(servingNumber){
   //update the recipe servings in state
   model.updateServings(servingNumber);
   //update the recipe view
-  recipeView.render(model.state.recipe);
+  //recipeView.render(model.state.recipe);
+  recipeView.update(model.state.recipe);
 }
 
 function init(){
