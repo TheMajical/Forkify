@@ -516,9 +516,15 @@ function controlServings(servingNumber) {
     //recipeView.render(model.state.recipe);
     _recipeViewJsDefault.default.update(_modelJs.state.recipe);
 }
+function controlBookmarks() {
+    if (_modelJs.state.recipe.bookmarked) _modelJs.deleteBookmark(_modelJs.state.recipe.id);
+    else _modelJs.addBookmark(_modelJs.state.recipe);
+    _recipeViewJsDefault.default.update(_modelJs.state.recipe);
+}
 function init() {
     _recipeViewJsDefault.default.addHandlerRender(controlRecipe);
     _recipeViewJsDefault.default.addHandlerUpdateServings(controlServings);
+    _recipeViewJsDefault.default.addHandlerAddBookmark(controlBookmarks);
     _searchViewJsDefault.default.addHandlerSearch(controlSearchResults);
     _paginationViewJsDefault.default.addHandlerClick(controlPagination);
 }
@@ -537,6 +543,10 @@ parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage
 );
 parcelHelpers.export(exports, "updateServings", ()=>updateServings
 );
+parcelHelpers.export(exports, "addBookmark", ()=>addBookmark
+);
+parcelHelpers.export(exports, "deleteBookmark", ()=>deleteBookmark
+);
 var _config = require("./config");
 var _helpers = require("./helpers");
 const state = {
@@ -547,7 +557,8 @@ const state = {
         results: [],
         page: 1,
         resultsPerPage: _config.RES_PER_PAGE
-    }
+    },
+    bookmarks: []
 };
 async function loadRecipe(id) {
     try {
@@ -563,6 +574,9 @@ async function loadRecipe(id) {
             cookingTime: recipe.cooking_time,
             ingredients: recipe.ingredients
         };
+        if (state.bookmarks.some((bookmark)=>bookmark.id === id
+        )) state.recipe.bookmarked = true;
+        else state.recipe.bookmarked = false;
     } catch (err) {
         throw err;
     }
@@ -594,6 +608,18 @@ function updateServings(newServings) {
         ing.quantity = ing.quantity * newServings / state.recipe.servings;
     });
     state.recipe.servings = newServings;
+}
+function addBookmark(recipe) {
+    // Add bookmark
+    state.bookmarks.push(recipe);
+    // Mark current recipe as bookmark
+    if (recipe.id === state.recipe.id) state.recipe.bookmarked = true;
+}
+function deleteBookmark(id) {
+    const index = state.bookmarks.findIndex((bk)=>bk.id === id
+    );
+    state.bookmarks.splice(index, 1);
+    if (id === state.recipe.id) state.recipe.bookmarked = false;
 }
 
 },{"./config":"6V52N","./helpers":"9RX9R","@parcel/transformer-js/src/esmodule-helpers.js":"ciiiV"}],"6V52N":[function(require,module,exports) {
@@ -722,9 +748,9 @@ class RecipeView extends _viewJsDefault.default {
                 <use href="${_iconsSvgDefault.default}#icon-user"></use>
               </svg>
             </div>
-            <button class="btn--round">
+            <button class="btn--round btn--bookmark">
               <svg class="">
-                <use href="${_iconsSvgDefault.default}#icon-bookmark-fill"></use>
+                <use href="${_iconsSvgDefault.default}#icon-bookmark${this._data.bookmarked ? '-fill' : ''}"></use>
               </svg>
             </button>
           </div>
@@ -794,6 +820,13 @@ class RecipeView extends _viewJsDefault.default {
             if (!btn) return;
             const { updateTo  } = btn.dataset;
             if (+updateTo > 0) handler1(+updateTo);
+        });
+    }
+    addHandlerAddBookmark(handler2) {
+        this._parentElement.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn--bookmark');
+            if (!btn) return;
+            handler2();
         });
     }
 }
