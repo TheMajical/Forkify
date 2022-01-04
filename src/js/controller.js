@@ -89,9 +89,14 @@ function firstBookmarkControl(){
   bookmarksView.render(model.state.bookmarks);
 }
 
-function controlAddRecipe(newRecipe){
-  console.log(newRecipe);
-  //Upload the new recipe data
+async function controlAddRecipe(newRecipe){
+  try{
+    //Upload the new recipe data
+    await model.uploadRecipe(newRecipe);
+  }catch(err){
+    addRecipeView.renderError(err);
+    console.error(err);
+  }
   
 }
 
