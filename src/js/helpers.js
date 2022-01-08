@@ -13,7 +13,7 @@ export async function sendJSON(url, uploadData){
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(uploadData),
+        body: JSON.stringify(uploadData)
       });
       const res = await Promise.race([fetchPro, timeout(10)]);
       const data = await res.json();

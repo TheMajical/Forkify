@@ -8,6 +8,7 @@ import addRecipeView from './views/addRecipeView.js';
 
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
+import { MODAL_CLOSE_SEC } from './config.js';
 
 const recipeContainer = document.querySelector('.recipe');
 
@@ -91,8 +92,19 @@ function firstBookmarkControl(){
 
 async function controlAddRecipe(newRecipe){
   try{
+    //Show loading spinner
+    addRecipeView.renderSpinner();
     //Upload the new recipe data
     await model.uploadRecipe(newRecipe);
+    console.log(model.state.recipe);
+    //Render Recipe
+    recipeView.render(model.state.recipe);
+    //Succes Message
+    addRecipeView.renderMessage();
+    //Close form
+    setTimeout(function(){
+      addRecipeView.toggleWindow();
+    }, MODAL_CLOSE_SEC * 1000);
   }catch(err){
     addRecipeView.renderError(err);
     console.error(err);
