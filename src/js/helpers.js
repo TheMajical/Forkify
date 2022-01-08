@@ -6,38 +6,27 @@ export const timeout = function (s) {
     });
   };
 
-export async function sendJSON(url, uploadData){
+export async function AJAX(url , uploadData = null){
   try{
-      const fetchPro = fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(uploadData)
-      });
-      const res = await Promise.race([fetchPro, timeout(10)]);
-      const data = await res.json();
+    const fetchPro = uploadData ? fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(uploadData)
+    }) : fetch(url);
 
-      if(!res.ok) throw new Error(`Wrong URL Id - ${res.status}`);
+    const res = await Promise.race([fetchPro, timeout(10)]);
+    const data = await res.json();
 
-      return data;
-  }
-  catch(err){
-      throw err;
+    if(!res.ok) throw new Error(`Wrong URL Id - ${res.status}`);
+
+    return data;
+
+  }catch(err){
+    throw err;
   }
 }
 
-export async function getJSON(url){
-    try{
-        const res = await Promise.race([fetch(url), timeout(10)]);
-        const data = await res.json();
 
-        if(!res.ok) throw new Error(`Wrong URL Id - ${res.status}`);
-
-        return data;
-    }
-    catch(err){
-        throw err;
-    }
-}
 

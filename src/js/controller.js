@@ -94,17 +94,28 @@ async function controlAddRecipe(newRecipe){
   try{
     //Show loading spinner
     addRecipeView.renderSpinner();
+
     //Upload the new recipe data
     await model.uploadRecipe(newRecipe);
     console.log(model.state.recipe);
+
     //Render Recipe
     recipeView.render(model.state.recipe);
+
     //Succes Message
     addRecipeView.renderMessage();
+
+    //Render bookmark view
+    bookmarksView.render(model.state.bookmarks);
+
+    //Change window url
+    window.history.pushState(null, '', `#${model.state.recipe.id}`);
+
     //Close form
     setTimeout(function(){
       addRecipeView.toggleWindow();
     }, MODAL_CLOSE_SEC * 1000);
+
   }catch(err){
     addRecipeView.renderError(err);
     console.error(err);

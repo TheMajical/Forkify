@@ -547,6 +547,10 @@ async function controlAddRecipe(newRecipe) {
         _recipeViewJsDefault.default.render(_modelJs.state.recipe);
         //Succes Message
         _addRecipeViewJsDefault.default.renderMessage();
+        //Render bookmark view
+        _bookmarksViewJsDefault.default.render(_modelJs.state.bookmarks);
+        //Change window url
+        window.history.pushState(null, '', `#${_modelJs.state.recipe.id}`);
         //Close form
         setTimeout(function() {
             _addRecipeViewJsDefault.default.toggleWindow();
@@ -617,7 +621,7 @@ function createRecipeObject(data) {
 }
 async function loadRecipe(id) {
     try {
-        const data = await _helpers.getJSON(`${_config.API_URL}/${id}`);
+        const data = await _helpers.AJAX(`${_config.API_URL}/${id}?key=${_config.KEY}`);
         state.recipe = createRecipeObject(data);
         if (state.bookmarks.some((bookmark)=>bookmark.id === id
         )) state.recipe.bookmarked = true;
@@ -629,13 +633,16 @@ async function loadRecipe(id) {
 async function loadSearchResults(query) {
     try {
         state.query = query;
-        const data = await _helpers.getJSON(`${_config.API_URL}?search=${query}`);
+        const data = await _helpers.AJAX(`${_config.API_URL}?search=${query}&key=${_config.KEY}`);
         state.search.results = data.data.recipes.map((rec)=>{
             return {
                 id: rec.id,
                 title: rec.title,
                 publisher: rec.publisher,
-                image: rec.image_url
+                image: rec.image_url,
+                ...rec.key && {
+                    key: rec.key
+                }
             };
         });
     } catch (err) {
@@ -693,7 +700,7 @@ async function uploadRecipe(newRecipe) {
             servings: +newRecipe.servings,
             ingredients
         };
-        const data = await _helpers.sendJSON(`${_config.API_URL}/?key=${_config.KEY}`, recipe);
+        const data = await _helpers.AJAX(`${_config.API_URL}/?key=${_config.KEY}`, recipe);
         state.recipe = createRecipeObject(data);
         addBookmark(state.recipe);
     } catch (err) {
@@ -760,9 +767,7 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "timeout", ()=>timeout
 );
-parcelHelpers.export(exports, "sendJSON", ()=>sendJSON
-);
-parcelHelpers.export(exports, "getJSON", ()=>getJSON
+parcelHelpers.export(exports, "AJAX", ()=>AJAX
 );
 const timeout = function(s) {
     return new Promise(function(_, reject) {
@@ -771,30 +776,17 @@ const timeout = function(s) {
         }, s * 1000);
     });
 };
-async function sendJSON(url, uploadData) {
+async function AJAX(url, uploadData = null) {
     try {
-        const fetchPro = fetch(url, {
+        const fetchPro = uploadData ? fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(uploadData)
-        });
+        }) : fetch(url);
         const res = await Promise.race([
             fetchPro,
-            timeout(10)
-        ]);
-        const data = await res.json();
-        if (!res.ok) throw new Error(`Wrong URL Id - ${res.status}`);
-        return data;
-    } catch (err) {
-        throw err;
-    }
-}
-async function getJSON(url) {
-    try {
-        const res = await Promise.race([
-            fetch(url),
             timeout(10)
         ]);
         const data = await res.json();
@@ -855,7 +847,7 @@ class RecipeView extends _viewJsDefault.default {
               </div>
             </div>
 
-            <div class="recipe__user-generated">
+            <div class="recipe__user-generated ${this._data.key ? '' : 'hidden'}">
               <svg>
                 <use href="${_iconsSvgDefault.default}#icon-user"></use>
               </svg>
@@ -1335,6 +1327,8 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _view = require("./View");
 var _viewDefault = parcelHelpers.interopDefault(_view);
+var _iconsSvg = require("../../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class ResultsView extends _viewDefault.default {
     _parentElement = document.querySelector('.results');
     _errorMessage = 'No recepies found for you query!Please try again ;)';
@@ -1354,8 +1348,11 @@ class ResultsView extends _viewDefault.default {
               <div class="preview__data">
                 <h4 class="preview__title">${result.title}</h4>
                 <p class="preview__publisher">${result.publisher}</p>
-                <div class="preview__user-generated">
-                </div>
+                <div class="recipe__user-generated ${this._data.key ? '' : 'hidden'}">
+                <svg>
+                  <use href="${_iconsSvgDefault.default}#icon-user"></use>
+                </svg>
+              </div>
               </div>
             </a>
           </li>
@@ -1364,7 +1361,7 @@ class ResultsView extends _viewDefault.default {
 }
 exports.default = new ResultsView();
 
-},{"./View":"9dvKv","@parcel/transformer-js/src/esmodule-helpers.js":"ciiiV"}],"2PAUD":[function(require,module,exports) {
+},{"./View":"9dvKv","@parcel/transformer-js/src/esmodule-helpers.js":"ciiiV","../../img/icons.svg":"d8AAi"}],"2PAUD":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _view = require("./View");
@@ -1428,6 +1425,8 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _view = require("./View");
 var _viewDefault = parcelHelpers.interopDefault(_view);
+var _iconsSvg = require("../../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class BookmarksView extends _viewDefault.default {
     _parentElement = document.querySelector('.bookmarks__list');
     _errorMessage = 'No bookmarks yet! Find a nice one and bookmark it ;)';
@@ -1450,8 +1449,11 @@ class BookmarksView extends _viewDefault.default {
               <div class="preview__data">
                 <h4 class="preview__title">${result.title}</h4>
                 <p class="preview__publisher">${result.publisher}</p>
-                <div class="preview__user-generated">
-                </div>
+                <div class="recipe__user-generated ${this._data.key ? '' : 'hidden'}">
+                <svg>
+                  <use href="${_iconsSvgDefault.default}#icon-user"></use>
+                </svg>
+              </div>
               </div>
             </a>
           </li>
@@ -1460,7 +1462,7 @@ class BookmarksView extends _viewDefault.default {
 }
 exports.default = new BookmarksView();
 
-},{"./View":"9dvKv","@parcel/transformer-js/src/esmodule-helpers.js":"ciiiV"}],"95FYz":[function(require,module,exports) {
+},{"./View":"9dvKv","@parcel/transformer-js/src/esmodule-helpers.js":"ciiiV","../../img/icons.svg":"d8AAi"}],"95FYz":[function(require,module,exports) {
 require('../modules/es.symbol');
 require('../modules/es.symbol.description');
 require('../modules/es.symbol.async-iterator');
