@@ -5,7 +5,11 @@ export const timeout = function (s) {
       }, s * 1000);
     });
   };
+  
 
+/**
+ * @param {string} a url link which we wanna fetch
+ */
 export async function AJAX(url , uploadData = null){
   try{
     const fetchPro = uploadData ? fetch(url, {

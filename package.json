@@ -2,10 +2,10 @@
   "name": "forkify",
   "version": "1.0.0",
   "description": "Recipe application",
-  "main": "controller.js",
+  "default": "controller.js",
   "scripts": {
     "start": "parcel index.html",
-    "build": "parcel build index.html"
+    "build": "parcel build index.html --dist-dir ./dist"
   },
   "repository": {
     "type": "git",
@@ -18,8 +18,9 @@
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.0.1",
-    "parcel": "^2.0.1",
-    "sass": "^1.26.10"
+    "parcel": "^1.12.4",
+    "sass": "^1.26.10",
+    "surge": "^0.20.1"
   },
   "dependencies": {
     "core-js": "^3.20.0",
