@@ -16,15 +16,16 @@ After downloading or cloning the repo, type `npm run start` in the terminal to l
 
 ### Note
 
-You will need to sign up for an API key at [Food2Fork](https://www.food2fork.com/about/api) to use in `Recipe.js`.
+You will need to sign up for an API key at [Forkify](https://forkify-api.herokuapp.com/v2) to use in `config.js`.
 
 ## Built With
 
-- Webpack
-- Babel
+- Parcel
 - JavaScript
+- [core-js](https://www.npmjs.com/package/core-js)
+- [regenator-runtime](https://www.npmjs.com/package/regenerator-runtime)
 - [Fraction.js](https://github.com/infusion/Fraction.js)
-- [Food2Fork API](https://www.food2fork.com/about/api)
+- [forkify API](https://forkify-api.herokuapp.com/v2)
 
 ## Re-creator
 
