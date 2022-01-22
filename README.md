@@ -27,6 +27,9 @@ You will need to sign up for an API key at [Forkify](https://forkify-api.herokua
 - [Fraction.js](https://github.com/infusion/Fraction.js)
 - [forkify API](https://forkify-api.herokuapp.com/v2)
 
+## Live Preview
+- [Here](https://forkify-v2.netlify.app)
+
 ## Re-creator
 
 - Me - [TheMajical](https://github.com/TheMajical)
